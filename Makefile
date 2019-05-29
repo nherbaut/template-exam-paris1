@@ -1,21 +1,26 @@
-.DEFAULT_GOAL := exam
+.DEFAULT_GOAL := all
 YEAR=2018-2019
 COURSE=DEVWEB
-DATE=
+DATE=26 Juin 2019
+
+all: exam solution dist
 
 bootstrap:
-	mkdir ./build
+	@mkdir -p ./build
 
 clean:
-	rm -rf ./build/
-	latexmk -c
+	@latexmk -c
+
+dist: 
+	@find ./build/ -type f ! -name '*.pdf' -delete
 	
 exam: clean bootstrap
-	latexmk  -pdf -jobname=build/exam_$(COURSE)_$(YEAR) exam.tex
+	@latexmk  -pdf -jobname=build/$@_$(COURSE)_$(YEAR) exam.tex
+	@evince build/$@_$(COURSE)_$(YEAR).pdf &
 
 solution: clean bootstrap
-	latexmk  	-pdf \
-				-jobname=build/solution_$(COURSE)_$(YEAR) \
-				--pdflatex="/usr/bin/pdflatex --file-line-error --shell-escape --synctex=1 %O '\def\issolution{1}\input{%S}'"\
+	@latexmk  	-pdf \
+				-jobname=build/$@_$(COURSE)_$(YEAR) \
+				--pdflatex="/usr/bin/pdflatex --file-line-error --shell-escape --synctex=1 %O '\def\issolution{1}\def\examDate{$(DATE)}\input{%S}'"\
 				exam.tex
-	evince build/solution_$(COURSE)_$(YEAR).pdf &
+	@evince build/$@_$(COURSE)_$(YEAR).pdf &
