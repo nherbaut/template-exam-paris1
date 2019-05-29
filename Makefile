@@ -1,26 +1,30 @@
 .DEFAULT_GOAL := all
+.PHONY := all bootstrap clean dist
 YEAR=2018-2019
-COURSE=DEVWEB
+FILENAME=DEVWEB
+COURSENAME=Développement WEB --- Session 2
+CURICULUM=L2 MIASHS Renforcement Informatique
+DURATION=1h30
 DATE=26 Juin 2019
+PROFNAME=Nicolas Herbaut
+Makefile: ;
 
-all: exam solution dist
+all: clean exam solution dist;
 
 bootstrap:
 	@mkdir -p ./build
 
 clean:
 	@latexmk -c
+	@rm -rf ./build/*
 
 dist: 
 	@find ./build/ -type f ! -name '*.pdf' -delete
 	
-exam: clean bootstrap
-	@latexmk  -pdf -jobname=build/$@_$(COURSE)_$(YEAR) exam.tex
-	@evince build/$@_$(COURSE)_$(YEAR).pdf &
-
-solution: clean bootstrap
-	@latexmk  	-pdf \
-				-jobname=build/$@_$(COURSE)_$(YEAR) \
-				--pdflatex="/usr/bin/pdflatex --file-line-error --shell-escape --synctex=1 %O '\def\issolution{1}\def\examDate{$(DATE)}\input{%S}'"\
+%: bootstrap 
+	latexmk  	-pdf \
+				-jobname=build/$@_$(FILENAME)_$(YEAR) \
+				--pdflatex="/usr/bin/pdflatex --file-line-error --shell-escape --synctex=1 %O '\def\examDate{$(DATE)}\def\duration{$(DURATION)}\def\courseName{$(COURSENAME)}\def\curiculum{$(CURICULUM)}\def\profname{$(PROFNAME)}\def\is$@{1}\input{%S}'"\
 				exam.tex
-	@evince build/$@_$(COURSE)_$(YEAR).pdf &
+	evince build/$@_$(FILENAME)_$(YEAR).pdf &
+
